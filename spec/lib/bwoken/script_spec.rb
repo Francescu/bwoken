@@ -95,8 +95,11 @@ describe Bwoken::Script do
   end
 
   describe '#cmd' do
-    # WORKING:
+    # WORKING: (Doesn't seems to use the same trace file)
     # instruments -w "iPhone 5s (8.1 Simulator)" -t Automation build/iphonesimulator/BwokenTestApp.app -D integration/tmp/trace -e UIASCRIPT integration/tmp/javascript/iphone/example.js -e UIARESULTSPATH integration/tmp/results
+
+    # This one has been working for me:
+    # instruments -t Automation -D integration/tmp/trace -w "iPhone 5s (8.1 Simulator)" build/iphonesimulator/BwokenTestApp.app -e UIASCRIPT integration/tmp/javascript/iphone/example.js -e UIARESULTSPATH integration/tmp/results
 
     let!(:trace_file_path) { stub_out(subject.class, :trace_file_path, 'trace_file_path') }
     let!(:env_variables_for_cli) { stub_out(subject, :env_variables_for_cli, 'baz') }
@@ -106,11 +109,11 @@ describe Bwoken::Script do
     let(:want_simulator) { true }
     let(:regexp) do
       /\s*instruments\s+
-        #{expected_device_flag_regexp}
-        -t\s"Automation"\s+
-        -D\s"#{trace_file_path}"\s+
-        "#{app_dir}"\s+
-        #{env_variables_for_cli}/x
+      -t\s"Automation"\s+
+      -D\s"#{trace_file_path}"\s+
+      #{expected_device_flag_regexp}
+      "#{app_dir}"\s+
+      #{env_variables_for_cli}/x
     end
 
     before do
@@ -127,7 +130,7 @@ describe Bwoken::Script do
     end
 
     context 'when a device is not connected' do
-      let(:expected_device_flag_regexp) { '' }
+      let(:expected_device_flag_regexp) { '-w\s"iPhone 5s (8.1 Simulator)"\s+' }
 
       its(:cmd) { should match regexp }
     end
