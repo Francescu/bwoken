@@ -14,3 +14,4 @@ spec/reports
 tmp
 bundler_bin
 /.bundle/install.log
+.idea
