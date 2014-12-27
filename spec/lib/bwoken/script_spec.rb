@@ -105,32 +105,27 @@ describe Bwoken::Script do
     let!(:env_variables_for_cli) { stub_out(subject, :env_variables_for_cli, 'baz') }
 
     let(:uuid) { 'abcdef1234567890' }
+    let(:device_id) { 'iPhone\s5s\s\(.*?\)' }
     let(:app_dir) { 'bar' }
     let(:want_simulator) { true }
-    let(:regexp) do
-      /\s*instruments\s+
-      -t\s"Automation"\s+
-      -D\s"#{trace_file_path}"\s+
-      #{expected_device_flag_regexp}
-      "#{app_dir}"\s+
-      #{env_variables_for_cli}/x
-    end
+    let(:regexp) { /instruments\s+-t\sAutomation\s+-D\s"#{trace_file_path}"\s+-w\s"#{expected_device_flag_regexp}"\s+"#{app_dir}"\s+"#{env_variables_for_cli}"/x }
 
     before do
       subject.app_dir = app_dir
       subject.simulator = want_simulator
-      Bwoken::Device.stub(:uuid => uuid)
     end
 
     context 'when a device is connected' do
+      before { Bwoken::Device.stub(:uuid => uuid) }
       let(:want_simulator) { false }
-      let(:expected_device_flag_regexp) { "-w\\s#{uuid}\\s+" }
+      let(:expected_device_flag_regexp) { "#{uuid}" }
 
       its(:cmd) { should match regexp }
     end
 
     context 'when a device is not connected' do
-      let(:expected_device_flag_regexp) { '-w\s"iPhone 5s (8.1 Simulator)"\s+' }
+      before { Bwoken::Device.stub(:uuid => device_id) }
+      let(:expected_device_flag_regexp) { "#{device_id}" }
 
       its(:cmd) { should match regexp }
     end

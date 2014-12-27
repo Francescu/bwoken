@@ -37,12 +37,7 @@ module Bwoken
 
     def cmd
       #%Q|"#{File.expand_path('../../../bin', __FILE__)}/unix_instruments.sh" \
-      %Q|instruments \
-        -t "Automation" \
-        -D "#{self.class.trace_file_path}" \
-        #{device_flag} \
-        "#{app_dir}" \
-        #{env_variables_for_cli}|.tap{|x| puts "SCRIPT: #{x}"}
+      %Q|instruments -t Automation -D "#{self.class.trace_file_path}" -w "#{device_flag}" "#{app_dir}" "#{env_variables_for_cli}"|.tap{|x| puts "SCRIPT: #{x}"}
     end
 
     def device_flag
@@ -50,7 +45,7 @@ module Bwoken
         return "-w \"#{device}\""
       end
 
-      simulator ? '-w "iPhone 5s (8.1 Simulator)"' : "-w #{Bwoken::Device.uuid}"
+      simulator ? 'iPhone 5s (8.1 Simulator)' : "#{Bwoken::Device.uuid}"
     end
 
     def run
